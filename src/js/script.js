@@ -4,8 +4,10 @@
 function listenToDevice(device) {
   device.addEventListener('midimessage', e => {
     const [command, key, velocity] = e.data;
+    if (command === 144) {  // Note On, Ch. 1
+      osc.frequency.setValueAtTime(Math.pow(2, (key - 69) / 12) * 440, audioCtx.currentTime);
+    }
     console.log(`${command}, ${key}, ${velocity}`);
-    osc.frequency.setValueAtTime(Math.pow(2, (key - 69) / 12) * 440, audioCtx.currentTime);
   });
 }
 
