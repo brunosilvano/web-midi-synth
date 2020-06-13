@@ -29,7 +29,7 @@ window.navigator.requestMIDIAccess()
   })
   .catch(err => console.error(`Unable to get MIDI devices: ${err}`));
 
-// Initialize AudioContect
+// Initialize AudioContext
 const AudioContext = window.AudioContext || window.webkitAudioContext;
 const audioCtx = new AudioContext();
 
