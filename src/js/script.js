@@ -7,7 +7,8 @@ function listenToDevice(device) {
   device.addEventListener('midimessage', e => {
     const [command, key, velocity] = e.data;
     if (command === 144) {  // Note On, Ch. 1
-      osc.frequency.setValueAtTime(Math.pow(2, (key - 69) / 12) * 440, audioCtx.currentTime);
+      osc.frequency.setValueAtTime(Math.pow(2, (key - 69) / 12) * 440, audioCtx.currentTime); // convert MIDI key number to frequency
+      gainNode.gain.value = velocity / 127; // set volume on key press
     }
     console.log(`${command}, ${key}, ${velocity}`);
 
@@ -39,11 +40,9 @@ osc.type = 'sine';
 osc.frequency.setValueAtTime(440, audioCtx.currentTime);
 osc.start();
 
-// UI controls
-function startOsc() {
-  osc.connect(audioCtx.destination);
-}
+// Initalize Gain Node to control volume
+let gainNode = audioCtx.createGain();
+gainNode.gain.value = 0;
 
-function stopOsc() {
-  osc.disconnect(audioCtx.destination);
-}
+// Apply connections
+osc.connect(gainNode).connect(audioCtx.destination);
