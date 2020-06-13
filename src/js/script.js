@@ -21,11 +21,11 @@ function listenToDevice(device) {
 window.navigator.requestMIDIAccess()
   .then(access => {
     const inputDevices = Array.from(access.inputs.values());
-    console.log(`Input devices: ${inputDevices}`);
+    console.log(`Input devices: ${inputDevices.map( (device, index) => `${index}: ${device.name}`)}`);
     listenToDevice(inputDevices[0]);
 
     const outputDevices = Array.from(access.outputs.values());
-    console.log(`Output devices: ${outputDevices}`);
+    console.log(`Output devices: ${outputDevices.map( (device, index) => `${index}: ${device.name}`)}`);
     ouputMIDIDevice = outputDevices[0];
   })
   .catch(err => console.error(`Unable to get MIDI devices: ${err}`));
