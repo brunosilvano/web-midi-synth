@@ -26,7 +26,8 @@ window.navigator.requestMIDIAccess()
     const outputDevices = Array.from(access.outputs.values());
     console.log(`Output devices: ${outputDevices}`);
     ouputMIDIDevice = outputDevices[0];
-  });
+  })
+  .catch(err => console.error(`Unable to get MIDI devices: ${err}`));
 
 // Initialize AudioContect
 const AudioContext = window.AudioContext || window.webkitAudioContext;
