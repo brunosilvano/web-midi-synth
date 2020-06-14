@@ -9,6 +9,8 @@ class Synth {
   gainNode = null;
   osc = null;
 
+  pressedNotes = [];
+
   _initializeAudioContext() {
     if (this.audioCtx) return;  // avoid initialization from running again
 
@@ -42,8 +44,23 @@ class Synth {
       const [command, key, velocity] = ev.data; // parse MIDI event
 
       if (command === 144) {  // Note On, Ch. 1
-        this.osc.frequency.setValueAtTime(Math.pow(2, (key - 69) / 12) * 440, this.audioCtx.currentTime); // convert MIDI key number to frequency
-        this.gainNode.gain.setTargetAtTime(velocity / 127, this.audioCtx.currentTime, 0.001); // set volume on key press
+        const indexOfNote = this.pressedNotes.indexOf(key);  // check if new note already in pressedNotes
+
+        // Add note if Note On, remove note if Note Off
+        if (velocity === 0) {
+          if (indexOfNote !== -1) this.pressedNotes.splice(indexOfNote, 1);
+        } else {
+          if (indexOfNote === -1) this.pressedNotes.push(key);
+        }
+
+        // If there is any note pressed, sound the last pressed one; Mute otherwise
+        if (this.pressedNotes.length) {
+          const note = this.pressedNotes[this.pressedNotes.length - 1];
+          this.osc.frequency.setValueAtTime(Math.pow(2, (note - 69) / 12) * 440, this.audioCtx.currentTime); // convert MIDI key number to frequency
+          this.gainNode.gain.setTargetAtTime(1, this.audioCtx.currentTime, 0.001); // set volume on key press
+        } else {
+          this.gainNode.gain.setTargetAtTime(0, this.audioCtx.currentTime, 0.001); // set volume on key press
+        }
       }
 
       // Loop back input data, to light up the MIDI controller keys
