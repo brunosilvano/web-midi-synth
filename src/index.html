@@ -4,8 +4,26 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Web Audio MIDI Synth</title>
+
+  <script src="js/Synth.js"></script>
   <script src="js/script.js"></script>
 </head>
 <body>
+
+  <div style="display: flex; flex-direction: column;">
+    <div style="margin: 1rem;">
+      <label for="inputMIDISelect">Input MIDI Device:</label>
+      <select name="inputMIDISelect" id="inputMIDISelect">
+        <option value="" disabled selected>Select MIDI device</option>
+      </select>
+    </div>
+    <div style="margin: 1rem;">
+      <label for="outputMIDISelect">Output MIDI Device:</label>
+      <select name="outputMIDISelect" id="outputMIDISelect">
+        <option value="" disabled selected>Select MIDI device</option>
+      </select>
+    </div>
+  </div>
+
 </body>
 </html>

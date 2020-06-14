@@ -1,48 +1,49 @@
 'use strict';
 
-let ouputMIDIDevice = null;
+const synth = new Synth();
 
-// Listen to input from specific device
-function listenToDevice(device) {
-  device.addEventListener('midimessage', e => {
-    const [command, key, velocity] = e.data;
-    if (command === 144) {  // Note On, Ch. 1
-      osc.frequency.setValueAtTime(Math.pow(2, (key - 69) / 12) * 440, audioCtx.currentTime); // convert MIDI key number to frequency
-      gainNode.gain.setValueAtTime(velocity / 127, audioCtx.currentTime); // set volume on key press
-    }
-    console.log(`${command}, ${key}, ${velocity}`);
+window.onload = () => {
 
-    // Loop MIDI back to turn on keys' lights
-    ouputMIDIDevice.send([command, key, velocity]);
+  const inputMIDISelect = document.getElementById('inputMIDISelect');
+  const outputMIDISelect = document.getElementById('outputMIDISelect');
+
+  let inputMIDIDevices = [];
+  let outputMIDIDevices = [];
+
+  // Load MIDI devices
+  window.navigator.requestMIDIAccess()
+    .then(midiAccess => {
+
+      inputMIDIDevices = Array.from(midiAccess.inputs.values());
+      outputMIDIDevices = Array.from(midiAccess.outputs.values());
+
+      // Populate input select element
+      for (let inputDevice of inputMIDIDevices) {
+        let option = document.createElement('option');
+        option.value = inputDevice.id;
+        option.innerText = inputDevice.name;
+        inputMIDISelect.appendChild(option);
+      }
+
+      // Populate output select element
+      for (let outputDevice of outputMIDIDevices) {
+        let option = document.createElement('option');
+        option.value = outputDevice.id;
+        option.innerText = outputDevice.name;
+        outputMIDISelect.appendChild(option);
+      }
+    })
+    .catch(err => console.error(`Unable to get MIDI devices: ${err}`));
+
+  // Update synth MIDI devices
+  inputMIDISelect.addEventListener('change', ev => {
+    const id = ev.target.value;
+    synth.setInputMIDIDevice(inputMIDIDevices.filter(device => device.id === id)[0]);
   });
+
+  outputMIDISelect.addEventListener('change', ev => {
+    const id = ev.target.value;
+    synth.setOutputMIDIDevice(outputMIDIDevices.filter(device => device.id === id)[0]);
+  });
+
 }
-
-// Load MIDI devices
-window.navigator.requestMIDIAccess()
-  .then(access => {
-    const inputDevices = Array.from(access.inputs.values());
-    console.log(`Input devices: ${inputDevices.map( (device, index) => `${index}: ${device.name}`)}`);
-    listenToDevice(inputDevices[0]);
-
-    const outputDevices = Array.from(access.outputs.values());
-    console.log(`Output devices: ${outputDevices.map( (device, index) => `${index}: ${device.name}`)}`);
-    ouputMIDIDevice = outputDevices[0];
-  })
-  .catch(err => console.error(`Unable to get MIDI devices: ${err}`));
-
-// Initialize AudioContext
-const AudioContext = window.AudioContext || window.webkitAudioContext;
-const audioCtx = new AudioContext();
-
-// Initialize oscillator
-let osc = audioCtx.createOscillator();
-osc.type = 'sine';
-osc.frequency.setValueAtTime(440, audioCtx.currentTime);
-osc.start();
-
-// Initalize Gain Node to control volume
-let gainNode = audioCtx.createGain();
-gainNode.gain.setValueAtTime(0, audioCtx.currentTime);
-
-// Apply connections
-osc.connect(gainNode).connect(audioCtx.destination);
