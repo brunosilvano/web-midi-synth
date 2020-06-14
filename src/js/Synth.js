@@ -43,7 +43,7 @@ class Synth {
 
       if (command === 144) {  // Note On, Ch. 1
         this.osc.frequency.setValueAtTime(Math.pow(2, (key - 69) / 12) * 440, this.audioCtx.currentTime); // convert MIDI key number to frequency
-        this.gainNode.gain.setValueAtTime(velocity / 127, this.audioCtx.currentTime); // set volume on key press
+        this.gainNode.gain.setTargetAtTime(velocity / 127, this.audioCtx.currentTime, 0.001); // set volume on key press
       }
 
       // Loop back input data, to light up the MIDI controller keys
