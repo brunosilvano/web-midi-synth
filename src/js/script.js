@@ -46,4 +46,14 @@ window.onload = () => {
     synth.setOutputMIDIDevice(outputMIDIDevices.filter(device => device.id === id)[0]);
   });
 
+  // Controls
+  // LFO
+  document.getElementById('lfoAmountControl').addEventListener('input', ev => {
+    synth.lfo.setAmount(parseFloat(ev.target.value));
+  });
+
+  document.getElementById('lfoFrequencyControl').addEventListener('input', ev => {
+    synth.lfo.setFrequency(parseFloat(ev.target.value));
+  });
+
 }
