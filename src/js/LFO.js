@@ -1,12 +1,13 @@
 'use strict';
 
 class LFO {
+
   audioCtx = null;
   modulationGain = null;
   osc = null;
 
   constructor(audioContext) {
-    if (!audioContext) throw Error('Not AudioContext provided to LFO constructor.');
+    if (!audioContext) throw Error('No AudioContext provided to LFO constructor.');
     this.audioCtx = audioContext;
 
     this.osc = this.audioCtx.createOscillator();
@@ -21,4 +22,5 @@ class LFO {
   connect(modulationTarget) {
     this.modulationGain.connect(modulationTarget);
   }
+
 }
