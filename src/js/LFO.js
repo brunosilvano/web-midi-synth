@@ -26,4 +26,8 @@ class LFO {
     this.modulationGain.gain.setValueAtTime(gain, this.audioCtx.currentTime);
   }
 
+  setFrequency(frequency) {
+    this.osc.frequency.setValueAtTime(frequency, this.audioCtx.currentTime);
+  }
+
 }
