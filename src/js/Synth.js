@@ -8,6 +8,8 @@ class Synth {
   audioCtx = null;
   gainNode = null;
   osc = null;
+  lfo = null;
+  modulationGain = null;
 
   pressedNotes = [];
 
@@ -22,18 +24,28 @@ class Synth {
 
   _initializeConnections() {
     // Apply connections between audio nodes
+    this.lfo.connect(this.modulationGain);  // modulate GainNode with LFO
+    this.modulationGain.connect(this.osc.frequency);
     this.osc.connect(this.gainNode).connect(this.audioCtx.destination);
+
+    // Start oscillators
+    this.osc.start();
+    this.lfo.start();
   }
 
   _initializeOsc() {
     if (!this.audioCtx) throw Error("AudioContext not initialized.");
 
     this.osc = this.audioCtx.createOscillator();
-    this.osc.start();
 
     // Initalize Gain Node to control volume
     this.gainNode = this.audioCtx.createGain();
     this.gainNode.gain.setValueAtTime(0, this.audioCtx.currentTime);
+
+    // LFO
+    this.lfo = this.audioCtx.createOscillator();
+    this.modulationGain = this.audioCtx.createGain();
+    this.modulationGain.gain.setValueAtTime(100, this.audioCtx.currentTime);
 
     this._initializeConnections();
   }
