@@ -12,7 +12,6 @@ class LFO {
 
     this.osc = this.audioCtx.createOscillator();
     this.modulationGain = this.audioCtx.createGain();
-    this.modulationGain.gain.value = 100; // TODO: move to variable value that can be set by a method
 
     this.osc.connect(this.modulationGain);
 
@@ -21,6 +20,10 @@ class LFO {
 
   connect(modulationTarget) {
     this.modulationGain.connect(modulationTarget);
+  }
+
+  setAmount(gain) {
+    this.modulationGain.gain.setValueAtTime(gain, this.audioCtx.currentTime);
   }
 
 }
