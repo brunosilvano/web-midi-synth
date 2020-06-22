@@ -24,13 +24,11 @@ class Synth {
 
   _initializeConnections() {
     // Apply connections between audio nodes
-    this.lfo.connect(this.modulationGain);  // modulate GainNode with LFO
-    this.modulationGain.connect(this.osc.frequency);
+    this.lfo.connect(this.osc.frequency);
     this.osc.connect(this.gainNode).connect(this.audioCtx.destination);
 
     // Start oscillators
     this.osc.start();
-    this.lfo.start();
   }
 
   _initializeOsc() {
@@ -43,9 +41,7 @@ class Synth {
     this.gainNode.gain.setValueAtTime(0, this.audioCtx.currentTime);
 
     // LFO
-    this.lfo = this.audioCtx.createOscillator();
-    this.modulationGain = this.audioCtx.createGain();
-    this.modulationGain.gain.setValueAtTime(100, this.audioCtx.currentTime);
+    this.lfo = new LFO(this.audioCtx);
 
     this._initializeConnections();
   }
