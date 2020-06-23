@@ -10,6 +10,7 @@ class Synth {
   osc = null;
   lfo = null;
   modulationGain = null;
+  delay = null;
 
   pressedNotes = [];
 
@@ -23,9 +24,14 @@ class Synth {
   }
 
   _initializeConnections() {
+    this.delay = new Delay(this.audioCtx);
+
     // Apply connections between audio nodes
     this.lfo.connect(this.osc.frequency);
     this.osc.connect(this.gainNode).connect(this.audioCtx.destination);
+
+    this.osc.connect(this.gainNode).connect(this.delay.getDelay());
+    this.delay.connect(this.audioCtx.destination);
 
     // Start oscillators
     this.osc.start();
@@ -65,7 +71,7 @@ class Synth {
         if (this.pressedNotes.length) {
           const note = this.pressedNotes[this.pressedNotes.length - 1];
           this.osc.frequency.setValueAtTime(Math.pow(2, (note - 69) / 12) * 440, this.audioCtx.currentTime); // convert MIDI key number to frequency
-          this.gainNode.gain.setTargetAtTime(1, this.audioCtx.currentTime, 0.001); // set volume on key press
+          this.gainNode.gain.setTargetAtTime(0.5, this.audioCtx.currentTime, 0.001); // set volume on key press
         } else {
           this.gainNode.gain.setTargetAtTime(0, this.audioCtx.currentTime, 0.001); // set volume on key press
         }
