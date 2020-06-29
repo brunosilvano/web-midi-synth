@@ -6,7 +6,7 @@ class Synth {
   outputMIDIDevice = null;
 
   audioCtx = null;
-  gainNode = null;
+  envelope = null;
   osc = null;
   lfo = null;
   modulationGain = null;
@@ -25,7 +25,7 @@ class Synth {
   _initializeConnections() {
     // Apply connections between audio nodes
     this.lfo.connect(this.osc.frequency);
-    this.osc.connect(this.gainNode).connect(this.audioCtx.destination);
+    this.osc.connect(this.envelope.getInput()).connect(this.audioCtx.destination);
 
     // Start oscillators
     this.osc.start();
@@ -36,12 +36,11 @@ class Synth {
 
     this.osc = this.audioCtx.createOscillator();
 
-    // Initalize Gain Node to control volume
-    this.gainNode = this.audioCtx.createGain();
-    this.gainNode.gain.setValueAtTime(0, this.audioCtx.currentTime);
-
     // LFO
     this.lfo = new LFO(this.audioCtx);
+
+    // Envelope
+    this.envelope = new AD(this.audioCtx);
 
     this._initializeConnections();
   }
@@ -65,10 +64,11 @@ class Synth {
         if (this.pressedNotes.length) {
           const note = this.pressedNotes[this.pressedNotes.length - 1];
           this.osc.frequency.setValueAtTime(Math.pow(2, (note - 69) / 12) * 440, this.audioCtx.currentTime); // convert MIDI key number to frequency
-          this.gainNode.gain.setTargetAtTime(1, this.audioCtx.currentTime, 0.001); // set volume on key press
-        } else {
-          this.gainNode.gain.setTargetAtTime(0, this.audioCtx.currentTime, 0.001); // set volume on key press
+          this.envelope.triggerOn();
         }
+        // else {
+          // this.gainNode.gain.setTargetAtTime(0, this.audioCtx.currentTime, 0.001); // set volume on key press
+        // }
       }
 
       // Loop back input data, to light up the MIDI controller keys
